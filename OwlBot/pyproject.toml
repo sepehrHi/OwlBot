@@ -1,0 +1,28 @@
+[project]
+name = "owlbot"
+version = "1.0.0-beta"
+description = "OwlBot — Modular Telegram Windows Remote Control Agent"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+
+dependencies = [
+    "pytelegrambotapi>=4.0.0",
+    "pyautogui",
+    "keyboard",
+    "psutil",
+    "opencv-python",
+    "numpy",
+    "requests",
+    "pyperclip",
+    "pywifi",
+    "wmi",
+    "pycaw",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["owlbot*"]
+
+[tool.setuptools.package-dir]
+"" = "."
