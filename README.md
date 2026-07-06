@@ -43,7 +43,7 @@ pip install ./owlbot_remote-1.0.0_beta-py3-none-any.whl
 If you have access credentials to the private source repository, install it via SSH or HTTPS target URLs:
 
 ```bash
-pip install git+[https://github.com/YOUR_GITHUB_USERNAME/owlbot-remote.git](https://github.com/YOUR_GITHUB_USERNAME/owlbot-remote.git)
+pip install git+[https://github.com/sepehrHi/owlbot-remote.git](https://github.com/sepehrHi/owlbot-remote.git)
 
 ```
 
