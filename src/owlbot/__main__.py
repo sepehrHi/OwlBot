@@ -11,7 +11,26 @@ import argparse
 import sys
 
 
+def _ensure_utf8_console() -> None:
+    """
+    Force UTF-8 output on stdout/stderr.
+
+    Without this, running e.g. ``owlbot --help`` on a default Windows
+    console (legacy code page such as cp1252) raises ``UnicodeEncodeError``
+    because the CLI text contains emoji. ``errors="replace"`` guarantees we
+    never crash even on consoles that truly can't render some glyphs.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except (ValueError, AttributeError):
+                pass
+
+
 def main(argv: list[str] | None = None) -> None:
+    _ensure_utf8_console()
+
     parser = argparse.ArgumentParser(
         prog="owlbot",
         description="🦉 OwlBot — Modular Telegram Windows Remote Control Agent",

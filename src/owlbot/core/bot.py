@@ -39,6 +39,14 @@ def _configure_logging(config: BotConfig) -> None:
         "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
     )
 
+    # Force UTF-8 on stdout so emoji in future log messages never crash on
+    # a legacy Windows console code page (e.g. cp1252).
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        except (ValueError, AttributeError):
+            pass
+
     stream_handler = logging.StreamHandler(sys.stdout)
     stream_handler.setFormatter(formatter)
     root_owlbot_logger.addHandler(stream_handler)
