@@ -19,7 +19,7 @@ _FILE_ATTRIBUTE_HIDDEN = 0x02
 class FilesModule(BaseModule):
     name = "files"
 
-    def register(self) -> None:
+    def register(self) -> None:  # noqa: C901 -- flat list of independent handlers, not nested logic
         bot, auth, safe = self.bot, self.auth, self.safe
         cfg = self.config
 

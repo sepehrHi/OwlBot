@@ -22,7 +22,7 @@ class ScreenModule(BaseModule):
         super().__init__(*args, **kwargs)
         self._streaming = False
 
-    def register(self) -> None:
+    def register(self) -> None:  # noqa: C901 -- flat list of independent handlers, not nested logic
         bot, auth, safe = self.bot, self.auth, self.safe
         cfg = self.config
 

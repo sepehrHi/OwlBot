@@ -58,44 +58,59 @@ class MonitoringModule(BaseModule):
             self._active = False
             bot.reply_to(message, "🛑 Monitoring stopped.")
 
+    @staticmethod
+    def _read_cpu() -> str:
+        pct = psutil.cpu_percent(interval=1)
+        return f"📊 CPU: {pct}%"
+
+    @staticmethod
+    def _read_ram() -> str:
+        r = psutil.virtual_memory()
+        return f"📊 RAM: {r.percent}%  ({r.used / 1024**3:.2f} / {r.total / 1024**3:.2f} GB)"
+
+    @staticmethod
+    def _read_disk() -> str:
+        d = psutil.disk_usage("/")
+        return f"📊 Disk: {d.percent}%  ({d.used / 1024**3:.2f} / {d.total / 1024**3:.2f} GB)"
+
+    @staticmethod
+    def _read_temp(wmi_client: object) -> str:
+        if wmi_client is None:
+            return "❌ Temperature monitoring requires Windows (wmi)."
+        probes = wmi_client.Win32_TemperatureProbe()  # type: ignore[attr-defined]
+        if not probes:
+            return "❌ Temperature sensor not available."
+        t = probes[0].CurrentReading / 10.0
+        return f"🌡️ Temperature: {t:.1f}°C"
+
+    @staticmethod
+    def _init_wmi_client() -> object:
+        if sys.platform != "win32":
+            return None
+        try:
+            import wmi as wmi_mod
+            return wmi_mod.WMI()
+        except ImportError as exc:
+            logger.info("wmi unavailable — temperature monitoring disabled: %s", exc)
+            return None
+
     def _worker(self, chat_id: int, param: str) -> None:
         cfg = self.config
         bot = self.bot
-        wmi_client = None
-        if sys.platform == "win32":
-            try:
-                import wmi as wmi_mod
-                wmi_client = wmi_mod.WMI()
-            except ImportError as exc:
-                logger.info("wmi unavailable — temperature monitoring disabled: %s", exc)
+        wmi_client = self._init_wmi_client() if param == "temp" else None
+        readers = {
+            "cpu": self._read_cpu,
+            "ram": self._read_ram,
+            "disk": self._read_disk,
+            "temp": lambda: self._read_temp(wmi_client),
+        }
+        read_metric = readers[param]
 
         try:
             while self._active:
-                if param == "cpu":
-                    pct = psutil.cpu_percent(interval=1)
-                    bot.send_message(chat_id, f"📊 CPU: {pct}%")
-                elif param == "ram":
-                    r = psutil.virtual_memory()
-                    bot.send_message(
-                        chat_id,
-                        f"📊 RAM: {r.percent}%  ({r.used / 1024**3:.2f} / {r.total / 1024**3:.2f} GB)",
-                    )
-                elif param == "disk":
-                    d = psutil.disk_usage("/")
-                    bot.send_message(
-                        chat_id,
-                        f"📊 Disk: {d.percent}%  ({d.used / 1024**3:.2f} / {d.total / 1024**3:.2f} GB)",
-                    )
-                elif param == "temp":
-                    if wmi_client is None:
-                        bot.send_message(chat_id, "❌ Temperature monitoring requires Windows (wmi).")
-                        return
-                    probes = wmi_client.Win32_TemperatureProbe()
-                    if probes:
-                        t = probes[0].CurrentReading / 10.0
-                        bot.send_message(chat_id, f"🌡️ Temperature: {t:.1f}°C")
-                    else:
-                        bot.send_message(chat_id, "❌ Temperature sensor not available.")
+                bot.send_message(chat_id, read_metric())
+                if param == "temp" and wmi_client is None:
+                    return
                 time.sleep(cfg.monitor_interval)
         except Exception as exc:
             bot.send_message(chat_id, f"❌ Monitoring error: {exc}")
