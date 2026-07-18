@@ -24,12 +24,14 @@ def _register_modules() -> None:
     from owlbot.modules.processes import ProcessesModule
     from owlbot.modules.monitoring import MonitoringModule
     from owlbot.modules.network import NetworkModule
+    from owlbot.modules.ffmpeg import FFmpegModule
 
     MODULE_REGISTRY.update({
         "system": SystemModule,
         "processes": ProcessesModule,
         "monitoring": MonitoringModule,
         "network": NetworkModule,
+        "ffmpeg": FFmpegModule,
     })
 
     # UI modules — require opencv, pyautogui, numpy (optional)
