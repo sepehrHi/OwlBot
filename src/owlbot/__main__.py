@@ -56,7 +56,7 @@ def main(argv: list[str] | None = None) -> None:
         default=None,
         help=(
             "Comma-separated module names to load. "
-            "Defaults to all: system,screen,audio,files,input,processes,monitoring,network"
+            "Defaults to all: system,screen,audio,files,input,processes,monitoring,network,ffmpeg"
         ),
     )
     parser.add_argument(

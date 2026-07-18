@@ -4,6 +4,25 @@
 فرمت بر اساس [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) است و
 این پروژه از [Semantic Versioning](https://semver.org/) پیروی می‌کند.
 
+## [1.0.1] - 2026-07-18
+
+### ✨ Second release — Animations & Polish
+
+### Added
+- انیمیشن (پیام "در حال پردازش…" با ادیت خودکار) برای دستورات مهم: `/status`, `/uptime`, `/webcam`, `/ffmpeg_install`, `/netcheck`, `/screenshot`, `/wifiscan`
+- دانلود FFmpeg با timeout و retry خودکار (۳ بار تلاش با backoff)
+- لینک دانلود FFmpeg از `https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip` (جایگزین لینک BtbN latest)
+
+### Changed
+- متد `register` در `SystemModule` به توابع کمکی `_build_status_text()` و `_build_uptime_text()` تفکیک شد (رفع C901)
+- تابع `_download_with_retry` با retry و timeout به `ffmpeg.py` اضافه شد
+- به‌روزرسانی README.md و مستندات
+
+### Fixed
+- لینک FFmpeg از `latest` به release مشخص تغییر کرد (Gyan.dev essentials build)
+- `flake8 W605` در docstring (بک‌اسلش‌های escape)
+- وظایف issue #1: بررسی لینک دانلود FFmpeg
+
 ## [1.0.0-beta.0] - 2026-07-07
 
 ### ✨ اولین انتشار عمومی (First public release)

@@ -131,8 +131,11 @@ owlbot --token TOKEN --users 123 --disable-logging    # fully silent
 | | `/run` / `/cmd` / `/script` | Execute commands |
 | **monitoring** | `/monitor <cpu\|ram\|disk\|temp>` | Periodic alerts |
 | | `/stopmonitor` | Stop alerts |
-| **network** | `/wifiscan` | Scan Wi‑Fi networks |
+| **network** | `/netcheck` | Check internet connection |
+| | `/wifiscan` | Scan Wi‑Fi networks |
 | | `/clipboard get\|set` | Read / write clipboard |
+| **ffmpeg** | `/ffmpeg` | Check FFmpeg status |
+| | `/ffmpeg_install` | Download & install FFmpeg |
 
 ---
 
@@ -196,4 +199,39 @@ Distributed under the **MIT License**. See `LICENSE` for details.
 
 ---
 
-*Maintained by **sepehr H.I** 🦉*
+## 📚 Documentation
+
+All guides and API references are in the [`docs/`](docs/) directory (English only):
+
+| Guide | Description |
+|-------|-------------|
+| [Getting Started](docs/GETTING_STARTED.md) | Installation, configuration, quick start |
+| [Configuration](docs/CONFIGURATION.md) | Complete configuration reference |
+| [Modules](docs/MODULES.md) | All modules, commands, and features |
+| [API Reference](docs/API.md) | Python API reference |
+| [Security](docs/SECURITY.md) | Security best practices |
+| [Development](docs/DEVELOPMENT.md) | Contributing, testing, releasing |
+| [Examples](docs/EXAMPLES.md) | Usage examples and patterns |
+| [Documentation Index](docs/INDEX.md) | Full documentation index |
+
+### 🌐 Translations (README only)
+
+All technical docs are English-only. README translations are in [`docs/`](docs/):
+
+| Language | File |
+|----------|------|
+| 🇮🇷 Persian/Farsi | [README-fa.md](docs/README-fa.md) |
+| 🇪🇸 Spanish | [README-es.md](docs/README-es.md) |
+| 🇮🇹 Italian | [README-it.md](docs/README-it.md) |
+| 🇩🇪 German | [README-de.md](docs/README-de.md) |
+| 🇨🇳 Chinese (Simplified) | [README-zh.md](docs/README-zh.md) |
+| 🇫🇷 French | [README-fr.md](docs/README-fr.md) |
+| 🇷🇺 Russian | [README-ru.md](docs/README-ru.md) |
+| 🇯🇵 Japanese | [README-ja.md](docs/README-ja.md) |
+| 🇳🇱 Dutch | [README-nl.md](docs/README-nl.md) |
+| 🇹🇷 Turkish | [README-tr.md](docs/README-tr.md) |
+| 🇰🇷 Korean | [README-ko.md](docs/README-ko.md) |
+
+---
+
+*Maintained by **Sepehr H.I** 🦉*
