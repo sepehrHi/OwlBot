@@ -65,4 +65,5 @@
 - بخش سخت‌گیری‌های امنیتی (اعتبارسنجی عمیق ورودی، rate limiting و ...) در
   این نسخه به‌طور آگاهانه به نسخه‌های بعدی موکول شده است.
 
+[1.0.1]: https://github.com/sepehrHi/OwlBot/compare/v1.0.0-beta.0...v1.0.1
 [1.0.0-beta.0]: https://github.com/sepehrHi/OwlBot/releases/tag/v1.0.0-beta.0
