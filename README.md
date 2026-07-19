@@ -142,7 +142,9 @@ owlbot --token TOKEN --users 123 --disable-logging    # fully silent
 | | `/vpncheck` | Detect VPN/proxy/hosting IP |
 | | `/location` | Send IP-based location pin |
 | | `/gps` | Real GPS fix (Windows), IP fallback |
-| | `/locationlive <sec>` | Live location for N seconds |
+| | `/locationlive <sec>` | Live location for N seconds (IP-based) |
+| | `/gpslive <sec>` | Live GPS tracking (Windows), auto-updates in place |
+| | `/stopgpslive` | Stop live GPS tracking early |
 
 ---
 

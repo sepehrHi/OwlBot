@@ -4,6 +4,17 @@
 فرمت بر اساس [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) است و
 این پروژه از [Semantic Versioning](https://semver.org/) پیروی می‌کند.
 
+## [Unreleased]
+
+### Added
+- دو دستور جدید به ماژول `ip`:
+  - `/gpslive <sec>` — لوکیشن لایوِ واقعی مبتنی بر GPS؛ به‌جای یک پین ثابت،
+    هر ۱۵ ثانیه دوباره از Windows Location Services فیکس می‌گیره و همون
+    پیامِ live-location رو آپدیت می‌کنه (برخلاف `/locationlive` که مبتنی بر
+    IP و ثابته). اگه GPS واقعی در دسترس نبود، به‌صورت خودکار یک پین
+    IP-based (غیر لایو) می‌فرسته.
+  - `/stopgpslive` — توقف زودهنگام ردیابی لایو GPS.
+
 ## [1.0.2] - 2026-07-19
 
 ### ✨ Third release — IP & Location module

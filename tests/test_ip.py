@@ -103,3 +103,11 @@ def test_get_local_ips_returns_list():
     assert isinstance(ips, list)
     assert all(isinstance(ip, str) for ip in ips)
     assert all(not ip.startswith("127.") for ip in ips)
+
+
+# ── IPModule instance state (/gpslive, /stopgpslive) ─────────────────────────
+
+def test_init_gps_live_state_is_idle():
+    mod = IPModule(config=None, bot=None, auth=lambda f: f, safe=lambda f: f)
+    assert mod._gps_live_active is False
+    assert mod._gps_live_thread is None

@@ -527,7 +527,9 @@ IP-based fallback everywhere else)
 | `/vpncheck` | Heuristic VPN/proxy/hosting detection | — |
 | `/location` | Send an IP-based location pin to the chat | — |
 | `/gps` | Real GPS/Wi-Fi-triangulated fix (Windows), IP fallback otherwise | — |
-| `/locationlive <sec>` | Send a Telegram "live location" for N seconds | `sec` (60–86400) |
+| `/locationlive <sec>` | Send a Telegram "live location" for N seconds (IP-based, static) | `sec` (60–86400) |
+| `/gpslive <sec>` | Real GPS-based live tracking — re-polls every 15s and updates the same live-location bubble in place | `sec` (60–86400) |
+| `/stopgpslive` | Stop an active `/gpslive` session early | — |
 
 ### Features
 
@@ -542,6 +544,12 @@ IP-based fallback everywhere else)
 - **Live location**: uses Telegram's native live-location bubble; since
   the "device" is a stationary PC, the pin itself won't move, but the
   live-location UI (countdown, etc.) works as expected.
+- **Live GPS tracking (`/gpslive`)**: unlike the static `/locationlive`,
+  this re-polls Windows Location Services every 15s in a background
+  thread and edits the *same* live-location message in place via
+  `edit_message_live_location` — genuinely useful if the device is a
+  laptop that actually moves. Falls back to a single (non-live) IP-based
+  pin if no real GPS fix is available.
 
 ### Example Output
 

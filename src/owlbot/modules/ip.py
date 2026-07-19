@@ -1,7 +1,11 @@
 """
-IP module — /myip, /iplookup, /vpncheck, /location, /gps, /locationlive
+IP module — /myip, /iplookup, /vpncheck, /location, /gps, /locationlive,
+/gpslive, /stopgpslive
 Cross-platform IP + geolocation lookups, plus a best-effort real GPS fix
 on Windows (via Windows Location Services) with automatic IP-based fallback.
+/gpslive keeps re-polling the real GPS fix in the background and updates a
+single Telegram live-location bubble in place — actually useful for a
+laptop that moves, unlike the IP-based /locationlive which is static.
 
 Privacy note: every command here reveals the *device's* network identity
 and/or approximate physical location. Access is already gated by the
@@ -17,6 +21,8 @@ import re
 import socket
 import subprocess
 import sys
+import threading
+import time
 
 import requests
 
@@ -35,6 +41,12 @@ _GEO_URL = "http://ip-api.com/json/{target}"
 _PUBLIC_IP_URL = "https://api.ipify.org?format=json"
 
 _TARGET_RE = re.compile(r"^[A-Za-z0-9.:_-]{1,253}$")
+
+# How often /gpslive re-polls Windows Location Services and edits the
+# live-location bubble in place. Kept well above Telegram's minimum edit
+# interval so we don't hit rate limits, and above the GPS script's own
+# ~10s internal fix-wait loop.
+_GPS_LIVE_POLL_SECONDS = 15
 
 # Queries Windows Location Services (System.Device.Location) for a real
 # GPS / Wi-Fi-triangulated fix. Requires Location to be enabled in
@@ -62,6 +74,11 @@ $watcher.Stop()
 
 class IPModule(BaseModule):
     name = "ip"
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)  # type: ignore[arg-type]
+        self._gps_live_active = False
+        self._gps_live_thread: threading.Thread | None = None
 
     # ── Pure helpers (unit-testable, no bot/network side effects) ──────────
 
@@ -203,6 +220,69 @@ class IPModule(BaseModule):
             return False, "No GPS/location fix available (service disabled or no signal)."
         return True, output
 
+    # ── /gpslive background worker ──────────────────────────────────────
+
+    def _gps_live_worker(self, chat_id: int, seconds: int) -> None:
+        """
+        Repeatedly re-polls the real GPS fix and edits a single Telegram
+        live-location bubble in place until *seconds* elapses, /stopgpslive
+        is called, or the fix is lost for good. Falls back to a one-shot
+        (non-live) IP-based pin if real GPS is unavailable from the start.
+        """
+        bot = self.bot
+        deadline = time.monotonic() + seconds
+
+        ok, payload = self._windows_gps()
+        if not ok:
+            data = self._fetch_geo(None)
+            if data.get("status") != "success":
+                bot.send_message(
+                    chat_id, f"❌ Real GPS unavailable ({payload}) and IP fallback also failed.",
+                )
+                self._gps_live_active = False
+                return
+            bot.send_message(
+                chat_id,
+                f"⚠️ Real GPS unavailable ({payload})\n"
+                "Sending a single IP-based location pin instead (not truly live-tracked).",
+            )
+            bot.send_location(chat_id, data["lat"], data["lon"], live_period=seconds)
+            self._gps_live_active = False
+            return
+
+        lat_s, lon_s, _acc_s = payload.split(",")
+        sent = bot.send_location(chat_id, float(lat_s), float(lon_s), live_period=seconds)
+        bot.send_message(
+            chat_id,
+            f"🛰️ *Live GPS tracking started* for {seconds}s "
+            f"(re-checking every {_GPS_LIVE_POLL_SECONDS}s). Use /stopgpslive to stop early.",
+            parse_mode="Markdown",
+        )
+
+        try:
+            while self._gps_live_active and time.monotonic() < deadline:
+                time.sleep(_GPS_LIVE_POLL_SECONDS)
+                if not self._gps_live_active or time.monotonic() >= deadline:
+                    break
+                ok, payload = self._windows_gps()
+                if not ok:
+                    logger.debug("gpslive: fix temporarily unavailable (%s), keeping last position", payload)
+                    continue
+                try:
+                    lat_s, lon_s, _acc_s = payload.split(",")
+                    bot.edit_message_live_location(
+                        chat_id, sent.message_id,
+                        latitude=float(lat_s), longitude=float(lon_s),
+                    )
+                except Exception as exc:  # noqa: BLE001 — Telegram edit errors shouldn't kill the loop
+                    logger.debug("gpslive: live-location edit failed: %s", exc)
+        finally:
+            self._gps_live_active = False
+            try:
+                bot.stop_message_live_location(chat_id, sent.message_id)
+            except Exception:  # noqa: BLE001 — best-effort cleanup, live_period will expire anyway
+                pass
+
     # ── Handlers ─────────────────────────────────────────────────────────
 
     def register(self) -> None:  # noqa: C901
@@ -332,3 +412,38 @@ class IPModule(BaseModule):
                 f"📍 *Live location started* for {seconds}s (IP-based — a stationary PC won't move on the map).",
                 parse_mode="Markdown",
             )
+
+        @bot.message_handler(commands=["gpslive"])
+        @auth
+        @safe
+        def cmd_gpslive(message: object) -> None:
+            if self._gps_live_active:
+                bot.reply_to(message, "⚠️ Live GPS tracking already running. Use /stopgpslive first.")
+                return
+            parts = message.text.split(maxsplit=1)  # type: ignore[attr-defined]
+            if len(parts) < 2 or not parts[1].strip().isdigit():
+                bot.reply_to(
+                    message,
+                    "🛰️ Usage: `/gpslive <seconds>` (60–86400) — real GPS-based live location, "
+                    "with automatic IP-based fallback if unavailable.",
+                    parse_mode="Markdown",
+                )
+                return
+            seconds = max(60, min(int(parts[1].strip()), 86400))
+
+            bot.send_chat_action(message.chat.id, "find_location")
+            self._gps_live_active = True
+            self._gps_live_thread = threading.Thread(
+                target=self._gps_live_worker, args=(message.chat.id, seconds), daemon=True,
+            )
+            self._gps_live_thread.start()
+
+        @bot.message_handler(commands=["stopgpslive"])
+        @auth
+        @safe
+        def cmd_stopgpslive(message: object) -> None:
+            if not self._gps_live_active:
+                bot.reply_to(message, "⚠️ No active live GPS tracking.")
+                return
+            self._gps_live_active = False
+            bot.reply_to(message, "🛑 *Live GPS tracking stopped.*", parse_mode="Markdown")

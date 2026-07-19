@@ -84,7 +84,9 @@ _MODULE_HELP: dict[str, tuple[str, str]] = {
         "/vpncheck            — Detect VPN/proxy/hosting IP\n"
         "/location            — Send IP-based location pin\n"
         "/gps                 — Real GPS fix (Win), IP fallback\n"
-        "/locationlive <sec>  — Live location for N seconds",
+        "/locationlive <sec>  — Live location for N seconds (IP-based)\n"
+        "/gpslive <sec>       — Live GPS tracking (Win), auto-updates\n"
+        "/stopgpslive         — Stop live GPS tracking early",
     ),
 }
 
