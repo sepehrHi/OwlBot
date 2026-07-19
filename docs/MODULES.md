@@ -32,6 +32,7 @@ modules = [
 | `audio` | — | ✅ | `pycaw`, `pyaudio` |
 | `network` | — | ✅ | `pywifi` |
 | `ffmpeg` | — | ✅ | FFmpeg binary |
+| `ip` | ✅ (GPS fix Windows-only) | — | `requests` |
 
 ---
 
@@ -498,6 +499,64 @@ BotConfig(
 📶 Neighbor2          █░░░░░░░░░ -88 dBm  Open
 
 Total: 5 networks
+```
+
+---
+
+## 🌍 IP & Location Module
+
+**Platform**: Cross-platform (real GPS fix is Windows-only, with automatic
+IP-based fallback everywhere else)
+**Dependencies**: `requests` (already a core dependency — no extras needed)
+**Module class**: `IPModule`
+
+> ⚠️ Every command in this module reveals the device's network identity
+> and/or approximate physical location. Access is gated by the same
+> `authorized_users` allowlist as every other command (e.g. `/shutdown`,
+> `/run`) — this module does not widen the trust boundary, it only
+> exposes more about a machine you already control. See the
+> [Disclaimer](../README.md#-disclaimer) in the main README.
+
+### Commands
+
+| Command | Description | Parameters |
+|---------|-------------|------------|
+| `/myip` | Public + local IP addresses | — |
+| `/iplookup` | Geo/ISP lookup for the device's own public IP | — |
+| `/iplookup <ip>` | Geo/ISP lookup for an arbitrary IP or hostname | `ip` (IP or hostname) |
+| `/vpncheck` | Heuristic VPN/proxy/hosting detection | — |
+| `/location` | Send an IP-based location pin to the chat | — |
+| `/gps` | Real GPS/Wi-Fi-triangulated fix (Windows), IP fallback otherwise | — |
+| `/locationlive <sec>` | Send a Telegram "live location" for N seconds | `sec` (60–86400) |
+
+### Features
+
+- **Public IP**: via `api.ipify.org`
+- **Local IPs**: every non-loopback IPv4 address bound to the machine
+- **Geo/ISP lookup**: city, region, country, timezone, ISP, org — via `ip-api.com` (free tier, no API key)
+- **VPN/proxy detection**: heuristic, based on `ip-api.com`'s `proxy`/`hosting`/`mobile` flags
+- **Real GPS**: on Windows, queries `System.Device.Location.GeoCoordinateWatcher`
+  (Windows Location Services) for a real GPS or Wi-Fi-triangulated fix;
+  requires Location to be enabled in *Settings → Privacy → Location*.
+  Falls back automatically to IP-based location if unavailable or denied.
+- **Live location**: uses Telegram's native live-location bubble; since
+  the "device" is a stationary PC, the pin itself won't move, but the
+  live-location UI (countdown, etc.) works as expected.
+
+### Example Output
+
+```
+/iplookup 8.8.8.8
+
+🌍  IP Lookup — 8.8.8.8
+──────────────────────────────────
+📍  Mountain View, California, United States
+🏳️  US   ZIP: 94043
+🕒  Timezone: America/Los_Angeles
+🛰️  Coords: 37.4056, -122.0775
+🏢  ISP: Google LLC
+🏗️  Org: Google Public DNS
+🔌  Proxy/VPN: ✅ No (🏢 hosting/datacenter IP)
 ```
 
 ---

@@ -4,6 +4,27 @@
 فرمت بر اساس [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) است و
 این پروژه از [Semantic Versioning](https://semver.org/) پیروی می‌کند.
 
+## [1.0.2] - 2026-07-19
+
+### ✨ Third release — IP & Location module
+
+### Added
+- ماژول جدید `ip` با ۶ دستور:
+  - `/myip` — نمایش IP عمومی + همه‌ی IP‌های محلی دستگاه
+  - `/iplookup [ip]` — اطلاعات جغرافیایی/ISP برای خود سیستم یا یک IP/هاست دلخواه (از طریق `ip-api.com`)
+  - `/vpncheck` — تشخیص هیوریستیک VPN/پروکسی/IP دیتاسنتری
+  - `/location` — ارسال پین موقعیت مکانی تقریبی (بر پایه‌ی IP) روی نقشه‌ی تلگرام
+  - `/gps` — تلاش برای گرفتن فیکس واقعی GPS از طریق Windows Location Services، با fallback خودکار به موقعیت مبتنی بر IP
+  - `/locationlive <sec>` — ارسال Live Location تلگرام برای مدت مشخص
+- ۱۵ تست واحد جدید برای توابع خالص ماژول `ip` (بدون تماس شبکه‌ی واقعی)
+- بخش «Disclaimer» در انتهای `README.md`: این کتابخانه برای راحتی و مدیریت
+  دستگاه‌های خودتان ارائه شده؛ هرگونه استفاده‌ی نادرست بر عهده‌ی کاربر است
+  و به سازنده مربوط نیست.
+
+### Changed
+- `AVAILABLE_MODULES` و رجیستری ماژول‌ها برای شامل‌شدن `ip` به‌روزرسانی شد.
+- هِلپ داینامیک (`/help`) و `docs/MODULES.md` و `README.md` با بخش کامل ماژول `ip` به‌روزرسانی شدند.
+
 ## [1.0.1] - 2026-07-18
 
 ### ✨ Second release — Animations & Polish
@@ -65,5 +86,6 @@
 - بخش سخت‌گیری‌های امنیتی (اعتبارسنجی عمیق ورودی، rate limiting و ...) در
   این نسخه به‌طور آگاهانه به نسخه‌های بعدی موکول شده است.
 
+[1.0.2]: https://github.com/sepehrHi/OwlBot/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/sepehrHi/OwlBot/compare/v1.0.0-beta.0...v1.0.1
 [1.0.0-beta.0]: https://github.com/sepehrHi/OwlBot/releases/tag/v1.0.0-beta.0

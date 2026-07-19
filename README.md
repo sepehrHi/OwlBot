@@ -18,6 +18,7 @@
 - 🎹 **Peripheral control** — keyboard, mouse, hotkeys, audio volume
 - 📸 **Screen capture, webcam, timelapse, and screen streaming**
 - 🔊 **Voice recording, volume control, and incoming‑voice playback**
+- 🌍 **IP lookup, VPN/proxy detection, and GPS/IP-based location** (Telegram map pin)
 
 ---
 
@@ -136,6 +137,12 @@ owlbot --token TOKEN --users 123 --disable-logging    # fully silent
 | | `/clipboard get\|set` | Read / write clipboard |
 | **ffmpeg** | `/ffmpeg` | Check FFmpeg status |
 | | `/ffmpeg_install` | Download & install FFmpeg |
+| **ip** | `/myip` | Public + local IP addresses |
+| | `/iplookup [ip]` | Geo/ISP lookup (self or given IP) |
+| | `/vpncheck` | Detect VPN/proxy/hosting IP |
+| | `/location` | Send IP-based location pin |
+| | `/gps` | Real GPS fix (Windows), IP fallback |
+| | `/locationlive <sec>` | Live location for N seconds |
 
 ---
 
@@ -158,7 +165,8 @@ owlbot/
 │   ├── input.py          # Keyboard/mouse (Windows)
 │   ├── audio.py          # Audio control (Windows)
 │   ├── monitoring.py     # Resource monitoring
-│   └── network.py        # Wi‑Fi / clipboard
+│   ├── network.py        # Wi‑Fi / clipboard
+│   └── ip.py             # IP lookup, VPN check, GPS/IP location
 └── platform/
     └── telegram.py       # Telegram adapter
 ```
@@ -231,6 +239,22 @@ All technical docs are English-only. README translations are in [`docs/`](docs/)
 | 🇳🇱 Dutch | [README-nl.md](docs/README-nl.md) |
 | 🇹🇷 Turkish | [README-tr.md](docs/README-tr.md) |
 | 🇰🇷 Korean | [README-ko.md](docs/README-ko.md) |
+
+---
+
+## ⚠️ Disclaimer
+
+This library is provided for your own convenience — to remotely manage
+**your own** devices that you own or are explicitly authorized to
+administer. It is not intended for surveillance, monitoring, or control
+of any device or person without their knowledge and consent.
+
+Any misuse of this library (including unauthorized access to systems you
+do not own, tracking or monitoring individuals without consent, or any
+illegal activity) is solely the responsibility of the user. The author
+and maintainer(s) are not liable for any misuse, damages, or legal
+consequences arising from the use of this software. Use responsibly and
+in accordance with the laws of your jurisdiction.
 
 ---
 

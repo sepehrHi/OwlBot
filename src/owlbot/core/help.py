@@ -77,6 +77,15 @@ _MODULE_HELP: dict[str, tuple[str, str]] = {
         "/ffmpeg         — Check FFmpeg status\n"
         "/ffmpeg_install — Download & install FFmpeg",
     ),
+    "ip": (
+        "🌍  IP & Location",
+        "/myip                — Public + local IP addresses\n"
+        "/iplookup [ip]       — Geo/ISP lookup (self or given IP)\n"
+        "/vpncheck            — Detect VPN/proxy/hosting IP\n"
+        "/location            — Send IP-based location pin\n"
+        "/gps                 — Real GPS fix (Win), IP fallback\n"
+        "/locationlive <sec>  — Live location for N seconds",
+    ),
 }
 
 _HEADER = "🦉 *OwlBot — Remote Control*"
